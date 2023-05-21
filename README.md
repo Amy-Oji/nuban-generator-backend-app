@@ -1,0 +1,1 @@
+# nuban-generator-app
