@@ -18,7 +18,7 @@ public class NubanGeneratorController {
     private final NubanGeneratorService nubanGeneratorService;
 
     @PostMapping("/generate")
-    ResponseEntity<?> gerenateNuban(@RequestBody NubanGeneratorPayload payload){
+    ResponseEntity<?> gerenateNuban(@RequestBody NubanGeneratorPayload payload) throws Exception {
         return ResponseEntity.ok(nubanGeneratorService.generateNuban(payload));
     }
 }
