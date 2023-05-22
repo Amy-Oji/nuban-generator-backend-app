@@ -27,7 +27,6 @@ public class NubanGeneratorServiceImpl implements NubanGeneratorService{
     @Autowired
     private final NubanRepository nubanRepository;
 
-
     @Override
     public NubanGeneratorResponse generateNuban(NubanGeneratorPayload payload) throws Exception{
         
@@ -62,7 +61,6 @@ public class NubanGeneratorServiceImpl implements NubanGeneratorService{
 
         return bank != null;
     }
-
 
     private List<BankDataDto> getBankAndCbnCodes() throws IOException {
 
@@ -103,7 +101,6 @@ public class NubanGeneratorServiceImpl implements NubanGeneratorService{
 
         return sum;
     }
-
 
     private NubanGeneratorResponse setNubanEntityAndResponse (NubanGeneratorPayload payload, String generatedNuban){
 
