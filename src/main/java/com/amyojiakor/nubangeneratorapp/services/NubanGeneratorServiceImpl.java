@@ -37,8 +37,8 @@ public class NubanGeneratorServiceImpl implements NubanGeneratorService{
             throw new Exception("Invalid Bank Code. Please enter a valid bank code");
         }
         
-        if(serialNum.length() > SERIAL_NUMBER_LENGTH ){
-            throw new Exception("Serial Number should not be more than 9 digits.");
+        if(serialNum.length() > SERIAL_NUMBER_LENGTH || serialNum.isEmpty()){
+            throw new Exception("Serial Number should not be more than 9 digits and should not be empty");
         }
 
         serialNum = serialNum.length()<SERIAL_NUMBER_LENGTH ? padSerialNumber(serialNum) : serialNum;
