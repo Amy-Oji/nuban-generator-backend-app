@@ -47,7 +47,7 @@ public class NubanGeneratorServiceImpl implements NubanGeneratorService{
 
         String generatedNuban = serialNum + checkDigit;
 
-        return setNubanEntityAndResponse(payload, generatedNuban);
+        return setNubanEntityAndResponse(bankCode, serialNum, generatedNuban);
     }
 
     private boolean isBankCodeValid(String bankCode) throws IOException {
@@ -102,17 +102,18 @@ public class NubanGeneratorServiceImpl implements NubanGeneratorService{
         return sum;
     }
 
-    private NubanGeneratorResponse setNubanEntityAndResponse (NubanGeneratorPayload payload, String generatedNuban){
+    private NubanGeneratorResponse setNubanEntityAndResponse (String bankCode, String serialNum, String generatedNuban){
 
         LocalDateTime now = LocalDateTime.now();
 
         NubanEntity nubanEntity = new NubanEntity();
-        BeanUtils.copyProperties(payload, nubanEntity);
+        nubanEntity.setBankCode(bankCode);
+        nubanEntity.setSerialNum(serialNum);
         nubanEntity.setGeneratedNuban(generatedNuban);
         nubanEntity.setDateTime(now);
         nubanRepository.save(nubanEntity);
 
-        return new NubanGeneratorResponse(payload.bankCode(), payload.serialNum(), generatedNuban, now);
+        return new NubanGeneratorResponse(bankCode, serialNum, generatedNuban, now);
     }
 
 }
