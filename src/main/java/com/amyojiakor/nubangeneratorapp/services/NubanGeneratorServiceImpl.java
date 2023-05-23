@@ -26,6 +26,14 @@ public class NubanGeneratorServiceImpl implements NubanGeneratorService{
     @Autowired
     private final NubanRepository nubanRepository;
 
+    /**
+     * Generates a NUBAN (Nigeria Uniform Bank Account Number) based on the provided payload.
+     *
+     * @param payload The payload containing the bank code and serial number.
+     * @return A NubanGeneratorResponse object representing the generated NUBAN,
+     * including additional information such as the bank data and date/time.
+     * @throws Exception If the serial number is invalid (more than 9 digits or empty).
+     */
     @Override
     public NubanGeneratorResponse generateNuban(NubanGeneratorPayload payload) throws Exception{
         
@@ -47,6 +55,13 @@ public class NubanGeneratorServiceImpl implements NubanGeneratorService{
         return setNubanEntityAndResponse(bank, serialNum, generatedNuban);
     }
 
+    /**
+     * Retrieves the bank data for the given bank code.
+     *
+     * @param bankCode The bank code used to identify the bank.
+     * @return The BankDataDto object representing the bank information.
+     * @throws IOException If there is an error reading the bank list or if the bank code is invalid.
+     */
     private BankDataDto getBankData(String bankCode) throws IOException {
 
         List<BankDataDto> bankCodesList = getBankAndCbnCodes();
@@ -68,6 +83,12 @@ public class NubanGeneratorServiceImpl implements NubanGeneratorService{
         );
     }
 
+    /**
+     * Pads the given serial number with leading zeros to ensure it has a fixed length.
+     *
+     * @param serialNumber The serial number to be padded.
+     * @return The padded serial number as a string.
+     */
     private String padSerialNumber(String serialNumber) {
 
         StringBuilder paddedSerialNumber = new StringBuilder();
@@ -80,6 +101,13 @@ public class NubanGeneratorServiceImpl implements NubanGeneratorService{
         return paddedSerialNumber.toString();
     }
 
+    /**
+     * Calculates the check digit for generating the NUBAN (Nigeria Uniform Bank Account Number).
+     *
+     * @param bankCode      The bank code associated with the NUBAN.
+     * @param serialNumber  The serial number used to generate the NUBAN.
+     * @return The calculated check digit for the NUBAN.
+     */
     private long calculateNuban(String bankCode, String serialNumber){
 
         String bankCodeAndSerialNumber =  bankCode + serialNumber;
@@ -97,6 +125,14 @@ public class NubanGeneratorServiceImpl implements NubanGeneratorService{
         return sum;
     }
 
+    /**
+     * Sets the NUBAN entity and creates a response object.
+     *
+     * @param bank            The bank data associated with the NUBAN.
+     * @param serialNum       The serial number used to generate the NUBAN.
+     * @param generatedNuban  The generated NUBAN.
+     * @return The NubanGeneratorResponse containing the generated NUBAN, serial number, bank data, and date/time.
+     */
     private NubanGeneratorResponse setNubanEntityAndResponse (BankDataDto bank, String serialNum, String generatedNuban){
 
         LocalDateTime now = LocalDateTime.now();
