@@ -115,7 +115,7 @@ which can be summarized thus:
 
     __The Check Digit Algorithm:__
   
-    - Step 1. Calculate A*3+B*7+C*3+D*3+E*7+F*3+G*3+H*7+I*3+J*3+K*7+L*3
+    - Step 1. Calculate `A*3 + B*7 + C*3 + D*3 + E*7 + F*3 + G*3 + H*7 + I*3 + J*3 + K*7 + L*3`
 
     - Step 2. Calculate Modulo 10 of your result i.e. the remainder after dividing by 10
 
