@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
+import java.security.InvalidAlgorithmParameterException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.IntStream;
@@ -37,22 +38,26 @@ public class NubanGeneratorServiceImpl implements NubanGeneratorService{
     @Override
     public NubanGeneratorResponse generateNuban(NubanGeneratorPayload payload) throws Exception{
         
-        String serialNum = payload.serialNumber();
+        String serialNumber = payload.serialNumber();
         String bankCode = payload.bankCode();
+
+        if (!serialNumber.matches("^[0-9]*$") || !bankCode.matches("^[0-9]*$")) {
+            throw new Exception("values must contain only digits");
+        }
 
         BankDataDto bank = getBankData(bankCode);
         
-        if(serialNum.length() > SERIAL_NUMBER_LENGTH || serialNum.isEmpty()){
+        if(serialNumber.length() > SERIAL_NUMBER_LENGTH || serialNumber.isEmpty()){
             throw new Exception("Serial Number should not be more than 9 digits and should not be empty");
         }
 
-        serialNum = serialNum.length()<SERIAL_NUMBER_LENGTH ? padSerialNumber(serialNum) : serialNum;
+        serialNumber = serialNumber.length()<SERIAL_NUMBER_LENGTH ? padSerialNumber(serialNumber) : serialNumber;
 
-        long checkDigit = calculateNuban(bankCode, serialNum);
+        long checkDigit = calculateCheckDigit(bankCode, serialNumber);
 
-        String generatedNuban = serialNum + checkDigit;
+        String generatedNuban = serialNumber + checkDigit;
 
-        return setNubanEntityAndResponse(bank, serialNum, generatedNuban);
+        return setNubanEntityAndResponse(bank, serialNumber, generatedNuban);
     }
 
     /**
@@ -103,13 +108,16 @@ public class NubanGeneratorServiceImpl implements NubanGeneratorService{
 
     /**
      * Calculates the check digit for generating the NUBAN (Nigeria Uniform Bank Account Number)
-     * following the CBN provided formula: A*3+B*7+C*3+D*3+E*7+F*3+G*3+H*7+I*3+J*3+K*7+L*3.
+     * following the CBN provided formula: A*+B*7+C*3+D*3+E*7+F*3+G*3+H*7+I*3+J*3+K*7+L*3
+     * then divide the sum by 10
+     * then subtract the sum from 10
+     * if what is left is 10, then 0 is the check digit. Else, what is left is now the check digit.
      *
      * @param bankCode      The bank code associated with the NUBAN.
      * @param serialNumber  The serial number used to generate the NUBAN.
      * @return The calculated check digit for the NUBAN.
      */
-    private long calculateNuban(String bankCode, String serialNumber){
+    private long calculateCheckDigit(String bankCode, String serialNumber){
 
         String bankCodeAndSerialNumber =  bankCode + serialNumber;
 
@@ -119,11 +127,9 @@ public class NubanGeneratorServiceImpl implements NubanGeneratorService{
                 .mapToLong(i -> (splitBankCodeAndSerialNumber[i] - '0') * NUBAN_MULTIPLIERS[i])
                 .sum();
 
-        long result = sum % MODULO_VALUE;
+        sum = sum % MODULO_VALUE;
 
-        sum = MODULO_VALUE - result == MODULO_VALUE ? 0 : MODULO_VALUE - result;
-
-        return sum;
+        return MODULO_VALUE - sum == MODULO_VALUE ? 0 : MODULO_VALUE - sum;
     }
 
     /**
