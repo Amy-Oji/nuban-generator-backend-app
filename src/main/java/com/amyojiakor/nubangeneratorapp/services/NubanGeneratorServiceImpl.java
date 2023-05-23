@@ -102,7 +102,8 @@ public class NubanGeneratorServiceImpl implements NubanGeneratorService{
     }
 
     /**
-     * Calculates the check digit for generating the NUBAN (Nigeria Uniform Bank Account Number).
+     * Calculates the check digit for generating the NUBAN (Nigeria Uniform Bank Account Number)
+     * following the CBN provided formula: A*3+B*7+C*3+D*3+E*7+F*3+G*3+H*7+I*3+J*3+K*7+L*3.
      *
      * @param bankCode      The bank code associated with the NUBAN.
      * @param serialNumber  The serial number used to generate the NUBAN.
@@ -120,7 +121,7 @@ public class NubanGeneratorServiceImpl implements NubanGeneratorService{
 
         long result = sum % MODULO_VALUE;
 
-        sum = 10 - result == 10 ? 0 : 10 - result;
+        sum = MODULO_VALUE - result == MODULO_VALUE ? 0 : MODULO_VALUE - result;
 
         return sum;
     }
