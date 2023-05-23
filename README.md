@@ -78,21 +78,24 @@ You can use Postman, a popular API testing tool, to send requests to the NUBAN G
 
    ```json
    {
-     "bankCode": "057",
-     "serialNum": "123456789"
-   }
+    "bankCode": "057",
+    "serialNumber": "123456789"
+    }
    ```
 
 7. Click the **Send** button to send the request.
 8. If the bank code and serial number are valid, the response will contain a JSON object with the newly generated NUBAN and other detail:
 
    ```json
-   {
-    "bankCode": "057",
-    "serialNum": "123456789",
-    "generatedNuban": "1234567899",
-    "dateTime": "2023-05-22T17:26:02.22312"
-   }
+    {
+    "generatedNUBAN": "1234567899",
+    "serialNumber": "123456789",
+    "bankData": {
+        "bankName": "Zenith Bank",
+        "uniqueCbnBankCode": "057"
+      },
+    "dateTime": "2023-05-23T09:39:10.151663"
+    }
    ```
    If there is an error, the response will contain an appropriate error message.
 
