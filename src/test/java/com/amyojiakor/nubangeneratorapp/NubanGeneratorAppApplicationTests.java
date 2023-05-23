@@ -36,7 +36,23 @@ class NubanGeneratorAppApplicationTests {
 
 		NubanGeneratorResponse response = nubanGeneratorService.generateNuban(payload);
 
-		Assertions.assertEquals(expectedNuban, response.generatedNuban());
+		Assertions.assertEquals(expectedNuban, response.generatedNUBAN());
+	}
+
+	@Test
+	public void testGenerateNuban_lessThan9DigitsSerialNum_ReturnsPaddedSerialNum() throws Exception {
+		// Arrange
+		String bankCode = "044";
+		String serialNum = "61"; //less than 9 digits serial number
+		NubanGeneratorPayload payload = new NubanGeneratorPayload(bankCode, serialNum);
+		String expectedSerialNum = "000000061";
+
+		NubanGeneratorResponse response = nubanGeneratorService.generateNuban(payload);
+
+		Assertions.assertEquals(9, response.serialNumber().length());
+
+		Assertions.assertEquals(expectedSerialNum, response.serialNumber());
+
 	}
 
 	@Test
