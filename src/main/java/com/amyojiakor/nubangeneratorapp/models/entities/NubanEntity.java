@@ -13,6 +13,7 @@ public class NubanEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String bankCode;
+    private String bankName;
     private String serialNum;
     private String generatedNuban;
     private LocalDateTime dateTime;
