@@ -8,7 +8,6 @@ import com.amyojiakor.nubangeneratorapp.repositories.NubanRepository;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -30,12 +29,10 @@ public class NubanGeneratorServiceImpl implements NubanGeneratorService{
     @Override
     public NubanGeneratorResponse generateNuban(NubanGeneratorPayload payload) throws Exception{
         
-        String serialNum = payload.serialNum();
+        String serialNum = payload.serialNumber();
         String bankCode = payload.bankCode();
-        
-        if(!isBankCodeValid(bankCode)){
-            throw new Exception("Invalid Bank Code. Please enter a valid bank code");
-        }
+
+        BankDataDto bank = getBankData(bankCode);
         
         if(serialNum.length() > SERIAL_NUMBER_LENGTH || serialNum.isEmpty()){
             throw new Exception("Serial Number should not be more than 9 digits and should not be empty");
@@ -47,19 +44,17 @@ public class NubanGeneratorServiceImpl implements NubanGeneratorService{
 
         String generatedNuban = serialNum + checkDigit;
 
-        return setNubanEntityAndResponse(bankCode, serialNum, generatedNuban);
+        return setNubanEntityAndResponse(bank, serialNum, generatedNuban);
     }
 
-    private boolean isBankCodeValid(String bankCode) throws IOException {
+    private BankDataDto getBankData(String bankCode) throws IOException {
 
         List<BankDataDto> bankCodesList = getBankAndCbnCodes();
 
-        BankDataDto bank = bankCodesList.stream().filter(b -> b.uniqueCbnBankCode()
+        return bankCodesList.stream().filter(b -> b.uniqueCbnBankCode()
                         .equals(bankCode))
                 .findFirst()
-                .orElseThrow(() -> new IOException("Invalid Bank Code"));
-
-        return bank != null;
+                .orElseThrow(() -> new IOException("Invalid Bank Code. Please enter a valid bank code"));
     }
 
     private List<BankDataDto> getBankAndCbnCodes() throws IOException {
@@ -102,18 +97,19 @@ public class NubanGeneratorServiceImpl implements NubanGeneratorService{
         return sum;
     }
 
-    private NubanGeneratorResponse setNubanEntityAndResponse (String bankCode, String serialNum, String generatedNuban){
+    private NubanGeneratorResponse setNubanEntityAndResponse (BankDataDto bank, String serialNum, String generatedNuban){
 
         LocalDateTime now = LocalDateTime.now();
 
         NubanEntity nubanEntity = new NubanEntity();
-        nubanEntity.setBankCode(bankCode);
+        nubanEntity.setBankCode(bank.uniqueCbnBankCode());
         nubanEntity.setSerialNum(serialNum);
+        nubanEntity.setBankName(bank.bankName());
         nubanEntity.setGeneratedNuban(generatedNuban);
         nubanEntity.setDateTime(now);
         nubanRepository.save(nubanEntity);
 
-        return new NubanGeneratorResponse(bankCode, serialNum, generatedNuban, now);
+        return new NubanGeneratorResponse(generatedNuban, serialNum, bank, now);
     }
 
 }
