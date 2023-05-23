@@ -52,28 +52,29 @@ class NubanGeneratorAppApplicationTests {
 		Assertions.assertEquals(9, response.serialNumber().length());
 
 		Assertions.assertEquals(expectedSerialNum, response.serialNumber());
-
 	}
 
 	@Test
-	public void testGenerateNuban_InvalidSerialNum_ReturnsErrorResponse() throws Exception {
-		// Arrange
-		String bankCode = "057";
-		String serialNum = ""; // Invalid input: empty serial number
-		NubanGeneratorPayload payload = new NubanGeneratorPayload(bankCode, serialNum);
+	public void testGenerateNuban_nonDigitInputs_ReturnsErrorResponse() throws Exception {
 
-		Assertions.assertThrows(Exception.class, () -> {
-			nubanGeneratorService.generateNuban(payload);
-		});	}
+		// Non-digit bank code
+		NubanGeneratorPayload payload = new NubanGeneratorPayload("ABC", "123456789");
+		Assertions.assertThrows(Exception.class, () -> nubanGeneratorService.generateNuban(payload));
+
+		// Non-digit serial number
+		NubanGeneratorPayload payload2 = new NubanGeneratorPayload("302", "ABCDE");
+		Assertions.assertThrows(Exception.class, () -> nubanGeneratorService.generateNuban(payload2));
+	}
 
 	@Test
-	public void testGenerateNuban_InvalidBanksCode_ReturnsErrorResponse() throws Exception {
-		// Arrange
-		String bankCode = "000"; // Invalid input: invalid bank code
-		String serialNum = "1234";
-		NubanGeneratorPayload payload = new NubanGeneratorPayload(bankCode, serialNum);
+	public void testGenerateNuban_InvalidBankCodeAndSerialNum_ReturnsErrorResponse() throws Exception {
 
-		Assertions.assertThrows(Exception.class, () -> {
-			nubanGeneratorService.generateNuban(payload);
-		});	}
+		// Invalid input: empty serial number
+		NubanGeneratorPayload payload = new NubanGeneratorPayload("057", "");
+		Assertions.assertThrows(Exception.class, () -> nubanGeneratorService.generateNuban(payload));
+
+		// Invalid input: invalid bank code
+		NubanGeneratorPayload payload2 = new NubanGeneratorPayload("000", "1234");
+		Assertions.assertThrows(Exception.class, () -> nubanGeneratorService.generateNuban(payload2));
+	}
 }
