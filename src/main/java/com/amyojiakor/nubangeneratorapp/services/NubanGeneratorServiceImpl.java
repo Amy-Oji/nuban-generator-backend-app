@@ -41,7 +41,7 @@ public class NubanGeneratorServiceImpl implements NubanGeneratorService{
         String bankCode = payload.bankCode();
 
         if (!serialNumber.matches("^[0-9]*$") || !bankCode.matches("^[0-9]*$")) {
-            throw new Exception("values must contain only digits");
+            throw new Exception("Input values must contain only digits");
         }
 
         BankDataDto bank = getBankData(bankCode);
@@ -118,12 +118,10 @@ public class NubanGeneratorServiceImpl implements NubanGeneratorService{
      */
     private long calculateCheckDigit(String bankCode, String serialNumber){
 
-        String bankCodeAndSerialNumber =  bankCode + serialNumber;
+        var bankCodeAndSerialNumberArr =  (bankCode + serialNumber).toCharArray();
 
-        var splitBankCodeAndSerialNumber  = bankCodeAndSerialNumber.toCharArray();
-
-        long sum = IntStream.range(0, splitBankCodeAndSerialNumber.length)
-                .mapToLong(i -> (splitBankCodeAndSerialNumber[i] - '0') * NUBAN_MULTIPLIERS[i])
+        long sum = IntStream.range(0, bankCodeAndSerialNumberArr.length)
+                .mapToLong(i -> (bankCodeAndSerialNumberArr[i] - '0') * NUBAN_MULTIPLIERS[i])
                 .sum();
 
         sum = sum % MODULO_VALUE;
